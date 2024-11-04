@@ -1,4 +1,5 @@
 import os
+import time
 
 import numpy as np
 import torch
@@ -25,14 +26,14 @@ def discrete_cmap(N, base_cmap=None):
 def plot_vehicle_routes(
     data,
     route,
-    ax1,
+    ax1: plt.Axes,
     greedy,
     markersize=5,
     visualize_demands=False,
     demand_scale=1,
     round_demand=False,
 ):
-    plt.rc("font", family="Times New Roman", size=10)
+    plt.rc("font", family="Helvetica", size=10)
 
     routes = [
         r[r != 0]
@@ -44,19 +45,19 @@ def plot_vehicle_routes(
     demands = data.demand.cpu().numpy() * 10
     demands = demands[1:]
 
-    capacity = data.capacity * 10
+    capacity: torch.Tensor = data.capacity * 10
 
     x_dep, y_dep = depot
     ax1.plot(x_dep, y_dep, "sk", markersize=markersize * 4)
     ax1.set_xlim(0, 1)
     ax1.set_ylim(0, 1)
 
-    legend = ax1.legend(loc="upper center")
+    _legend = ax1.legend(loc="upper center")
 
     cmap = discrete_cmap(len(routes) + 2, "nipy_spectral")
-    dem_rects = []
-    used_rects = []
-    cap_rects = []
+    dem_rects: list[Rectangle] = []
+    used_rects: list[Rectangle] = []
+    cap_rects: list[Rectangle] = []
     qvs = []
     total_dist = 0
     for veh_number, r in enumerate(routes):
@@ -74,18 +75,18 @@ def plot_vehicle_routes(
         dist = 0
         x_prev, y_prev = x_dep, y_dep
         cum_demand = 0
+
         for (x, y), d in zip(coords, route_demands):
             dist += np.sqrt((x - x_prev) ** 2 + (y - y_prev) ** 2)
 
-            cap_rects.append(Rectangle((x, y), 0.01, 0.1))
-            used_rects.append(
-                Rectangle((x, y), 0.01, 0.1 * total_route_demand / capacity)
-            )
-            dem_rects.append(
-                Rectangle(
-                    (x, y + 0.1 * cum_demand / capacity), 0.01, 0.1 * d / capacity
-                )
-            )
+            height_cap_rect = 0.1
+            height_used_rect = (0.1 * total_route_demand / capacity).item()
+            height_dem_rect = (0.1 * d / capacity).item()
+            y_dem_rect = (y + 0.1 * cum_demand / capacity).item()
+
+            cap_rects.append(Rectangle((x, y), 0.01, height_cap_rect))
+            used_rects.append(Rectangle((x, y), 0.01, height_used_rect))
+            dem_rects.append(Rectangle((x, y_dem_rect), 0.01, height_dem_rect))
 
             x_prev, y_prev = x, y
             cum_demand += d
@@ -177,7 +178,7 @@ def vrp_matplotlib(greedy=True):
     edges_index = torch.LongTensor(edges_index)
     edges_index = edges_index.transpose(dim0=0, dim1=1)
 
-    datas = []
+    datas: list[Data] = []
     data = Data(
         x=torch.from_numpy(node_[x]).float(),
         edge_index=edges_index,
@@ -266,5 +267,9 @@ def vrp_matplotlib(greedy=True):
             )
 
 
+start_time = time.time()
+
 # True:Greedy decoding / False:sampling1280
 vrp_matplotlib(greedy=True)
+
+print("Time:", time.time() - start_time)
