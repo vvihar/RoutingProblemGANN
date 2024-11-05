@@ -15,6 +15,8 @@ from VRP.VRP_Actor import Model
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 n_nodes = 101
 
+np.random.seed(0)
+
 
 def discrete_cmap(N, base_cmap=None):
     base = plt.colormaps.get_cmap(base_cmap)
