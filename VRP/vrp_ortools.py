@@ -154,7 +154,7 @@ def create_data_model():
     data = {}
     data["locations"] = node_[x]
     data["demands"] = list(int(d) for d in demand_[x])
-    data["num_vehicles"] = 12
+    data["num_vehicles"] = 20  # Maximum number of vehicles
     # Create capacity data whose length is equal to the number of vehicles.
     data["capacity"] = list(
         int(c) for c in np.array([capacity_.astype(np.int32)[x]] * data["num_vehicles"])
@@ -235,6 +235,7 @@ def main():
     # search_parameters.local_search_metaheuristic = (
     #     routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
     # )
+    # search_parameters.time_limit.seconds = 30
 
     # Solve the problem.
     solution = routing.SolveWithParameters(search_parameters)
@@ -260,6 +261,8 @@ def main():
                 route_distance += routing.GetArcCostForVehicle(
                     previous_index, index, vehicle_id
                 )
+            if route_distance == 0:
+                continue
             routes.append(route[1:])
             plan_output += " {0} Load({1})\n".format(
                 manager.IndexToNode(index), route_load
