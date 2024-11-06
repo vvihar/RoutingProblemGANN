@@ -1,5 +1,6 @@
 import os
 import time
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -267,11 +268,18 @@ def vrp_matplotlib(greedy=True):
                 demand_scale=50,
                 round_demand=True,
             )
+    return fig
 
 
-start_time = time.time()
+fig_dir = Path("fig")
+fig_dir.mkdir(exist_ok=True)
+for i in range(10):
+    start_time = time.time()
+    fig = vrp_matplotlib(greedy=True)
+    fig.savefig(fig_dir / f"rl_{i}.png")
+    elapsed_time = time.time() - start_time
+    print("Elapsed time: {:.2f} s".format(elapsed_time))
 
-# True:Greedy decoding / False:sampling1280
-vrp_matplotlib(greedy=True)
-
-print("Time:", time.time() - start_time)
+    # Record elapsed time
+    with open(fig_dir / "rl_elapsed_time.txt", "a") as f:
+        f.write("Elapsed time: {:.2f} s\n".format(elapsed_time))

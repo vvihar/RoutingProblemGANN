@@ -1,4 +1,3 @@
-import os
 import time
 import numpy as np
 from matplotlib import pyplot as plt
@@ -6,7 +5,7 @@ from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
-from pprint import pprint
+from pathlib import Path
 
 n_nodes = 101
 
@@ -103,8 +102,7 @@ def plot_vehicle_routes(
 
     if greedy:
         ax.set_title(
-            "OR-Tools,{} routes, total distance {:.2f}".format(len(routes),
-                                                        total_dist),
+            "OR-Tools,{} routes, total distance {:.2f}".format(len(routes), total_dist),
             family="Helvetica",
             size=20,
         )
@@ -287,8 +285,18 @@ def main():
         demand_scale=50,
         round_demand=True,
     )
+    return fig
 
 
-start_time = time.time()
-main()
-print("Time:", time.time() - start_time)
+fig_dir = Path("fig")
+fig_dir.mkdir(exist_ok=True)
+for i in range(10):
+    start_time = time.time()
+    fig = main()
+    fig.savefig(fig_dir / f"ortools_{i}.png")
+    elapsed_time = time.time() - start_time
+    print("Elapsed time: {:.2f} s".format(elapsed_time))
+
+    # Record elapsed time
+    with open(fig_dir / "ortools_elapsed_time.txt", "a") as f:
+        f.write("Elapsed time: {:.2f} s\n".format(elapsed_time))
