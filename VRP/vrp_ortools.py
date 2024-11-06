@@ -53,8 +53,8 @@ def plot_vehicle_routes(
     for veh_number, r in enumerate(routes):
         color = cmap(len(routes) - veh_number)
 
-        route_demands = [demands[i - 1] for i in r[1:-1]]  # Correctly map indices
-        coords = locs[[i - 1 for i in r[1:-1]], :]  # Correctly map indices
+        route_demands = [demands[i - 1] for i in r]  # Correctly map indices
+        coords = locs[[i - 1 for i in r], :]  # Correctly map indices
         xs, ys = coords.transpose()
 
         total_route_demand = sum(route_demands)
@@ -100,6 +100,22 @@ def plot_vehicle_routes(
             ),
         )
         qvs.append(qv)
+
+    if greedy:
+        ax.set_title(
+            "OR-Tools,{} routes, total distance {:.2f}".format(len(routes),
+                                                        total_dist),
+            family="Helvetica",
+            size=20,
+        )
+    else:
+        ax.set_title(
+            "Sampling1280,{} routes, total distance {:.2f}".format(
+                len(routes), total_dist
+            ),
+            family="Helvetica",
+            size=20,
+        )
 
     ax.legend(handles=qvs, loc=1)
     pc_cap = PatchCollection(
