@@ -117,7 +117,7 @@ def plot_vehicle_routes(
     if greedy:
         ax1.set_title(
             "Greedy,{} routes, total distance {:.2f}".format(len(routes), total_dist),
-            family="Times New Roman",
+            family="Helvetica",
             size=20,
         )
     else:
@@ -125,7 +125,7 @@ def plot_vehicle_routes(
             "Sampling1280,{} routes, total distance {:.2f}".format(
                 len(routes), total_dist
             ),
-            family="Times New Roman",
+            family="Helvetica",
             size=20,
         )
 
